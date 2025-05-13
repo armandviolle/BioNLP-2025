@@ -234,10 +234,13 @@ def mainFewShot(args):
         print(f"Using generated paraphrases saved at {Path(paraphrases_dir) / f"paraphrases_{args.model}.json"}\n")
     
     for seed in range(args.n_seeds):
+        print(f"Working on seed {seed}")
+        print(f"Using model {args.model}")
+        print(f"Using temperature {args.temperature}\n")
         case_id = 1
         answers = []
         for i in range(len(cases)):
-            all_examples = [ex for ex in paraphrases if ex['case_id']!=str(case_id)] # TODO: choose 5 randomly
+            all_examples = [ex for ex in paraphrases if ex['case_id']!=str(case_id)]
             selected_ids = np.random.choice([ex['case_id'] for ex in all_examples], size=5, replace=False)
             print(f"Selected example-cases for case {case_id}: {selected_ids}")
             used_examples = [ex for ex in all_examples if ex['case_id'] in selected_ids]

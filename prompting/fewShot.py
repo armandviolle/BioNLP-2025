@@ -1,3 +1,5 @@
+# Contributor: Armand
+
 import os, sys, json, argparse, bs4
 from pathlib import Path
 from typing import Union

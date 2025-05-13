@@ -4,11 +4,11 @@ dt=$(date '+%d-%m-%Y_%Hh%Mm%Ss')
 log_file="res/log_$dt.log"
 touch $log_file
 
-python -u src/few_shot.py \
-    --client_key "YOUR_KEY" \
-    --data /Users/armandviolle/Developer/challenge-BioNLP/data/dev/archehr-qa.xml \
-    --keys /Users/armandviolle/Developer/challenge-BioNLP/data/dev/archehr-qa_key.json \
-    --prompts_folder config \
+python -u prompting/fewShot.py \
+    --client_key "<your_key>" \
+    --data "<your path to>/data/dev/archehr-qa.xml" \
+    --keys "<your path to>/data/dev/archehr-qa_key.json" \
+    --prompts_folder config/prompts \
     --model gpt-4.1-mini \
     --temperature 0.3 \
     --res_path res \

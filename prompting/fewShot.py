@@ -21,7 +21,7 @@ def parse():
     parser.add_argument("--keys", default="./data/dev/archehr-qa_key.json", type=str)
     parser.add_argument("--prompts_folder", default="", type=str)
     parser.add_argument("--model", default="gpt-4o-mini", type=str)
-    parser.add_argument("--temperature", default=0.3, type=str)
+    parser.add_argument("--temperature", default=0.3, type=float)
     parser.add_argument("--res_path", default="", type=str)
     parser.add_argument("--date", default="", type=str)
     parser.add_argument("--n_seeds", default=5, type=int)
@@ -278,12 +278,14 @@ def mainZeroShot(args):
 
     cases = [case for case in data.find_all('case')]
     for seed in range(args.n_seeds):
-        print(f"\nWorking on seed {seed}\n")
+        print(f"Working on seed {seed}")
+        print(f"Using model {args.model}")
+        print(f"Using temperature {args.temperature}\n")
         case_id = 1
         answers = []
         for i in range(len(cases)):
             inference_case = cases[i]
-            print(f"Few-shotting case {inference_case['id']}")
+            print(f"Zero-shotting case {inference_case['id']}")
             answer = zeroShotGPT(
                 client=client,
                 system_prompt=system_prompt, 
@@ -302,8 +304,10 @@ def mainZeroShot(args):
 def main():
     args = parse()
     if args.mode == "few-shot":
+        print("FEW-SHOT SCRIPT RUNNING\n")
         mainFewShot(args=args)
     elif args.mode == "zero-shot":
+        print("ZERO-SHOT SCRIPT RUNNING\n")
         mainZeroShot(args=args)
 
 

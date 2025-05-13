@@ -1,0 +1,11 @@
+You are a clinical assistant. Your task is to compress a clinical response so that it contains fewer than 75 words in total while preserving the full set of cited sentence IDs. Follow these strict guidelines:
+- Your goal is to reduce the total word count to 75 words or fewer by merging and rephrasing the original sentences.
+- You must include all original sentence IDs in the final response, but you can combine them into fewer citation brackets.
+- Example:
+Original:
+<sentence A>. |1,2|
+<sentence B>. |4,8,16|
+Reformulated:
+<merged sentence>. |1,2,4,8,16|
+- Write the response as a series of individual sentences—one sentence per line.
+- Every statement in your response must be supported by one or more essential sentences.

@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "archehr"
+version = "0.1.0"
+description = "LIMICS@BioNLP 2025 shared task"
+authors = ["Adam Remaki", "Armand Violle", "Natrajvikram Sivabalasubramanian", "Etienne Guével", "Akram Redjdal"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.2.5"
+scikit-learn = "^1.6.1"
+pandas = "^2.2.3"
+dataset = "^1.6.2"
+torch = "^2.7.0"
+sentence-transformers = "^4.1.0"
+scipy = "^1.15.3"
+openai = "^1.78.1"
+nltk = "^3.9.1"
+
+[tool.poetry.dev-dependencies]
+ruff = "^3.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -21,6 +21,7 @@ def parse():
     parser.add_argument("--keys", default="./data/dev/archehr-qa_key.json", type=str)
     parser.add_argument("--prompts_folder", default="", type=str)
     parser.add_argument("--model", default="gpt-4o-mini", type=str)
+    parser.add_argument("--temperature", default=0.3, type=str)
     parser.add_argument("--res_path", default="", type=str)
     parser.add_argument("--date", default="", type=str)
     parser.add_argument("--n_seeds", default=5, type=int)
@@ -111,14 +112,17 @@ def zeroShotGPT(
     system_prompt: str, 
     user_prompt: str, 
     model_name: str,
+    temperature: float,
     seed: int = 42
 ) -> str:
+    messages=[
+        {"role": "system", "content": system_prompt}, 
+        {"role": "user", "content": user_prompt}, 
+    ]
     completion = client.chat.completions.create(
         model=model_name, 
-        messages=[
-            {"role": "system", "content": system_prompt}, 
-            {"role": "user", "content": user_prompt}, 
-        ],
+        temperature=temperature,
+        messages=messages,
         seed=seed
     )
     return completion.choices[0].message.content
@@ -137,6 +141,7 @@ def fewShotGPT(
     user_assistant_prompts: list,
     user_inference_prompt: str, 
     model_name: str,
+    temperature: float,
     seed: int = 42
 ) -> str:
     messages = [{"role": "system", "content": system_prompt}]
@@ -146,6 +151,7 @@ def fewShotGPT(
     messages.append({"role": "user", "content": user_inference_prompt})
     completion = client.chat.completions.create(
         model=model_name, 
+        temperature=temperature,
         messages=messages, 
         seed=seed
     )
@@ -164,6 +170,7 @@ def generateUserAssistantPrompts(
     labelled_cases: list,
     system_paraphrasing_prompt: str, 
     model_name: str, 
+    temperature: float,
     seed: int = 42
 ) -> list:
     responses = []
@@ -181,6 +188,7 @@ def generateUserAssistantPrompts(
                 system_prompt=system_paraphrasing_prompt, 
                 user_prompt=user_paraphrasing_input, 
                 model_name=model_name, 
+                temperature=temperature,
                 seed=seed
             ))
         })
@@ -218,7 +226,8 @@ def mainFewShot(args):
             client=client,
             labelled_cases=labelled_cases, 
             system_paraphrasing_prompt=system_paraphrasing_prompt, 
-            model_name=args.model
+            model_name=args.model, 
+            temperature=args.temperature
         )
         with open(Path(paraphrases_dir) / f"paraphrases_{args.model}.json", 'w') as res_para:
             json.dump(paraphrases, res_para)
@@ -240,6 +249,7 @@ def mainFewShot(args):
                 user_assistant_prompts=used_examples,
                 user_inference_prompt=formatInferencePrompt(case=inference_case), 
                 model_name=args.model,
+                temperature=args.temperature, 
                 seed=seed
             )
             answers.append({'case_id': str(case_id), 'answer': format_output_answer(answer)})
@@ -279,6 +289,7 @@ def mainZeroShot(args):
                 system_prompt=system_prompt, 
                 user_prompt=formatInferencePrompt(case=inference_case),
                 model_name=args.model, 
+                temperature=args.temperature,
                 seed=seed,
             )
             answers.append({'case_id': str(case_id), 'answer': format_output_answer(answer)})

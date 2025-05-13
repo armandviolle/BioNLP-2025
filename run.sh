@@ -10,6 +10,7 @@ python -u src/few_shot.py \
     --keys /Users/armandviolle/Developer/challenge-BioNLP/data/dev/archehr-qa_key.json \
     --prompts_folder config \
     --model gpt-4.1-mini \
+    --temperature 0.3 \
     --res_path res \
     --date "$dt" \
     --n_seeds 5 \

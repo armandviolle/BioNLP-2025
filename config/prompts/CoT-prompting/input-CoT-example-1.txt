@@ -6,54 +6,102 @@ I had severe abdomen pain and was hospitalised for 15 days in ICU, diagnoised wi
 
 Answer to the patient's question using relevant information within the medical note below.
 
-During the ERCP a pancreatic stent was required to facilitateaccess to the biliary system (removed at the end of theprocedure), and a common bile duct stent was placed to allowdrainage of the biliary obstruction caused by stones and sludge.However, due to the patient's elevated INR, no sphincterotomy orstone removal was performed. Frank pus was noted to be drainingfrom the common bile duct, and post-ERCP it was recommended thatthe patient remain on IV Zosyn for at least a week. TheVancomycin was discontinued.On hospital day 4 (post-procedure day 3) the patient returned toERCP for re-evaluation of her biliary stent as her LFTs andbilirubin continued an upward trend. On ERCP the previousbiliary stent was noted to be acutely obstructed by biliarysludge and stones. As the patient's INR was normalized to 1.2, asphincterotomy was safely performed, with removal of severalbiliary stones in addition to the common bile duct stent. At theconclusion of the procedure, retrograde cholangiogram wasnegative for filling defects.
+During the ERCP a pancreatic stent was required to facilitate
+access to the biliary system (removed at the end of the
+procedure), and a common bile duct stent was placed to allow
+drainage of the biliary obstruction caused by stones and sludge.
+However, due to the patient's elevated INR, no sphincterotomy or
+stone removal was performed. Frank pus was noted to be draining
+from the common bile duct, and post-ERCP it was recommended that
+the patient remain on IV Zosyn for at least a week. The
+Vancomycin was discontinued.
+On hospital day 4 (post-procedure day 3) the patient returned to
+ERCP for re-evaluation of her biliary stent as her LFTs and
+bilirubin continued an upward trend. On ERCP the previous
+biliary stent was noted to be acutely obstructed by biliary
+sludge and stones. As the patient's INR was normalized to 1.2, a
+sphincterotomy was safely performed, with removal of several
+biliary stones in addition to the common bile duct stent. At the
+conclusion of the procedure, retrograde cholangiogram was
+negative for filling defects.
 
 ## Response step 1
 In response to your question:
-Medications like Udiliv (ursodeoxycholic acid) can help dissolve certain types of bile sludge or small stones over time. However, they are not always effective, especially in cases where there is significant obstruction, infection, or persistent symptoms.
-In your case, the ERCP (Endoscopic Retrograde Cholangiopancreatography) was not just a treatment choice—it was a necessary intervention. Here's why:
-* During the first ERCP, doctors found that your common bile duct (CBD) was obstructed by both sludge and stones, which caused a biliary obstruction.
-* There was also frank pus draining from the bile duct, indicating a serious infection (cholangitis) that required urgent drainage—this cannot be resolved with oral medications alone.
-* Because your INR (a blood clotting test) was high at that time, the doctors could not immediately perform a sphincterotomy or remove the stones. Instead, they placed a temporary stent to keep bile draining and reduce the infection risk.
-* A few days later, as your INR normalized, a second ERCP was done to remove the stones and replace the blocked stent, finally clearing the obstruction.
-So to answer your question clearly:
-* No, medications alone (like Udiliv) were not enough in your case.
-* ERCP was not just the only cure—it was the safest and most effective way to relieve the obstruction, control the infection, and prevent further complications.
-You had a complex biliary obstruction with infection that required endoscopic intervention, not just medication.
 
+**Medications like Udiliv (ursodeoxycholic acid)** can help dissolve certain types of bile sludge or small stones over time. However, they are **not always effective**, especially in cases where there is **significant obstruction, infection, or persistent symptoms**.
+
+In your case, the **ERCP (Endoscopic Retrograde Cholangiopancreatography)** was not just a treatment choice—it was a **necessary intervention**. Here's why:
+
+* During the first ERCP, doctors found that your **common bile duct (CBD) was obstructed by both sludge and stones**, which caused a **biliary obstruction**.
+* There was also **frank pus draining from the bile duct**, indicating a serious **infection (cholangitis)** that required **urgent drainage**—this cannot be resolved with oral medications alone.
+* Because your **INR (a blood clotting test) was high** at that time, the doctors could not immediately perform a **sphincterotomy** or remove the stones. Instead, they placed a **temporary stent** to keep bile draining and reduce the infection risk.
+* A few days later, as your **INR normalized**, a second ERCP was done to **remove the stones and replace the blocked stent**, finally clearing the obstruction.
+
+So to answer your question clearly:
+
+* **No, medications alone (like Udiliv) were not enough** in your case.
+* **ERCP was not just the only cure—it was the safest and most effective way** to relieve the obstruction, control the infection, and prevent further complications.
+
+You had a complex biliary obstruction with infection that **required endoscopic intervention**, not just medication.
 
 ## Prompt step 2
 For each sentence of the answer:
+
 * Identify which sentences among the medical can contain information related to this response sentence.
 * Cite its/their "id" attribute(s) enclosed in pipe symbols ("|") at the end of the sentence.
 * You have to find at least one relevant citation per response sentence: none should be let without citation.
 
-To help, here is a sentence-by-sentence version of the medical note, with corresponding id attributes:id="1", Brief Hospital Course:id="2", During the ERCP a pancreatic stent was required to facilitate access to the biliary system (removed at the end of the procedure), and a common bile duct stent was placed to allow drainage of the biliary obstruction caused by stones and sludge.id="3", However, due to the patient's elevated INR, no sphincterotomy or stone removal was performed.id="4", Frank pus was noted to be draining from the common bile duct, and post-ERCP it was recommended that the patient remain on IV Zosyn for at least a week.id="5", The Vancomycin was discontinued.id="6", On hospital day 4 (post-procedure day 3) the patient returned to ERCP for re-evaluation of her biliary stent as her LFTs and bilirubin continued an upward trend.id="7", On ERCP the previous biliary stent was noted to be acutely obstructed by biliary sludge and stones.id="8", As the patient's INR was normalized to 1.2, a sphincterotomy was safely performed, with removal of several biliary stones in addition to the common bile duct stent.id="9", At the conclusion of the procedure, retrograde cholangiogram was negative for filling defects.
+To help, here is a sentence-by-sentence version of the medical note, with corresponding id attributes:
+id="1", Brief Hospital Course:
+id="2", During the ERCP a pancreatic stent was required to facilitate access to the biliary system (removed at the end of the procedure), and a common bile duct stent was placed to allow drainage of the biliary obstruction caused by stones and sludge.
+id="3", However, due to the patient's elevated INR, no sphincterotomy or stone removal was performed.
+id="4", Frank pus was noted to be draining from the common bile duct, and post-ERCP it was recommended that the patient remain on IV Zosyn for at least a week.
+id="5", The Vancomycin was discontinued.
+id="6", On hospital day 4 (post-procedure day 3) the patient returned to ERCP for re-evaluation of her biliary stent as her LFTs and bilirubin continued an upward trend.
+id="7", On ERCP the previous biliary stent was noted to be acutely obstructed by biliary sludge and stones.
+id="8", As the patient's INR was normalized to 1.2, a sphincterotomy was safely performed, with removal of several biliary stones in addition to the common bile duct stent.
+id="9", At the conclusion of the procedure, retrograde cholangiogram was negative for filling defects.
 
 ## Response step 2
 Here is your original answer, now annotated sentence by sentence with the corresponding citation IDs from the medical note:
 
-1. Medications like Udiliv (ursodeoxycholic acid) can help dissolve certain types of bile sludge or small stones over time. |7|
-2. However, they are not always effective, especially in cases where there is significant obstruction, infection, or persistent symptoms. |2|4|7|
-3. In your case, the ERCP (Endoscopic Retrograde Cholangiopancreatography) was not just a treatment choice—it was a necessary intervention. |2|4|6|7|
-4. During the first ERCP, doctors found that your common bile duct (CBD) was obstructed by both sludge and stones, which caused a biliary obstruction. |2|
-5. There was also frank pus draining from the bile duct, indicating a serious infection (cholangitis) that required urgent drainage—this cannot be resolved with oral medications alone. |4|
-6. Because your INR (a blood clotting test) was high at that time, the doctors could not immediately perform a sphincterotomy or remove the stones. |3|
-7. Instead, they placed a temporary stent to keep bile draining and reduce the infection risk. |2|
-8. A few days later, as your INR normalized, a second ERCP was done to remove the stones and replace the blocked stent, finally clearing the obstruction. |6|7|8|
-9. So to answer your question clearly: no, medications alone (like Udiliv) were not enough in your case. |2|4|7|
-10. ERCP was not just the only cure—it was the safest and most effective way to relieve the obstruction, control the infection, and prevent further complications. |2|4|7|8|
+---
+
+**1. Medications like Udiliv (ursodeoxycholic acid) can help dissolve certain types of bile sludge or small stones over time.** |7|
+
+**2. However, they are not always effective, especially in cases where there is significant obstruction, infection, or persistent symptoms.** |2|4|7|
+
+**3. In your case, the ERCP (Endoscopic Retrograde Cholangiopancreatography) was not just a treatment choice—it was a necessary intervention.** |2|4|6|7|
+
+**4. During the first ERCP, doctors found that your common bile duct (CBD) was obstructed by both sludge and stones, which caused a biliary obstruction.** |2|
+
+**5. There was also frank pus draining from the bile duct, indicating a serious infection (cholangitis) that required urgent drainage—this cannot be resolved with oral medications alone.** |4|
+
+**6. Because your INR (a blood clotting test) was high at that time, the doctors could not immediately perform a sphincterotomy or remove the stones.** |3|
+
+**7. Instead, they placed a temporary stent to keep bile draining and reduce the infection risk.** |2|
+
+**8. A few days later, as your INR normalized, a second ERCP was done to remove the stones and replace the blocked stent, finally clearing the obstruction.** |6|7|8|
+
+**9. So to answer your question clearly: no, medications alone (like Udiliv) were not enough in your case.** |2|4|7|
+
+**10. ERCP was not just the only cure—it was the safest and most effective way to relieve the obstruction, control the infection, and prevent further complications.** |2|4|7|8|
+
+---
 
 Each sentence in the response has been matched with at least one corresponding sentence from the medical note, as requested.
 
 ## Prompt step 3
-Reformulate the answer according to the following instructions: 
-- Try to remain close to cited sentences, without referring to nor quote them directly. 
-- Your output must contain **EXACTLY BETWEEN 70 AND 75 WORDS IN TOTAL**. Not approximately, **exactly between 70 and 75.** 
-- ALL CITED SENTENCE IDs OF THE INPUT ANSWER MUST BE PRESERVED IN THE FINAL RESPONSE, but you can combine them into fewer citation brackets (e.g., |1| ... |2,4| into |1,2,4|).
+Reformulate the answer according to the following instructions:
+
+* Answer to the patient.
+* Try to remain close to cited sentences, without referring to nor quote them directly.
+* Your output must contain **EXACTLY BETWEEN 70 AND 75 WORDS IN TOTAL**. Not approximately, **exactly between 70 and 75.**
+* ALL CITED SENTENCE IDs OF THE INPUT ANSWER MUST BE PRESERVED IN THE FINAL RESPONSE, but you can combine them into fewer citation brackets (e.g., |1| ... |2,4| into |1,2,4|).
+
 
 ## Response step 3
 Medications like Udiliv can help with mild sludge, but in your case, there was significant obstruction from both sludge and stones, along with infection, making drainage urgent |2,4,7|. Initial intervention placed a biliary stent, as immediate stone removal wasn’t possible due to high INR |2,3|. A second ERCP was later performed when INR improved, allowing stone removal and further clearance |6,7,8|. So, ERCP was necessary, not optional |2,4,7,8|.
 
 ## Prompt step 4
-Use one sentence per line.
+Use one sentence per line, with sentence citation at the end of each line.

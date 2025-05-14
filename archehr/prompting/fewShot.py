@@ -79,7 +79,7 @@ def extract_sentences(
     list_ids: list, 
     cases: BeautifulSoup
 ) -> list:
-    case = soup.find(lambda tag: tag.name=='case' and tag.has_attr('id') and tag['id']==case_id)
+    case = cases.find(lambda tag: tag.name=='case' and tag.has_attr('id') and tag['id']==case_id)
     out = [case.find('patient_question').get_text(strip=True)]
     sentences = case.find('note_excerpt_sentences')
     for sentence in sentences.find_all('sentence'):

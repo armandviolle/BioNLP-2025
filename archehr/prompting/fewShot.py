@@ -79,7 +79,7 @@ def extract_sentences(
     list_ids: list, 
     cases: BeautifulSoup
 ) -> list:
-    case = soup.find(lambda tag: tag.name=='case' and tag.has_attr('id') and tag['id']==case_id)
+    case = cases.find(lambda tag: tag.name=='case' and tag.has_attr('id') and tag['id']==case_id)
     out = [case.find('patient_question').get_text(strip=True)]
     sentences = case.find('note_excerpt_sentences')
     for sentence in sentences.find_all('sentence'):
@@ -240,6 +240,7 @@ def mainFewShot(args):
         case_id = 1
         answers = []
         for i in range(len(cases)):
+            np.random.seed(seed)
             all_examples = [ex for ex in paraphrases if ex['case_id']!=str(case_id)]
             selected_ids = np.random.choice([ex['case_id'] for ex in all_examples], size=5, replace=False)
             print(f"Selected example-cases for case {case_id}: {selected_ids}")
@@ -304,6 +305,90 @@ def mainZeroShot(args):
             json.dump(answers, res)
 
 
+
+def responseCoTGPT(
+    client: OpenAI,
+    system_prompt: str, 
+    user_prompt: str,
+    example_user: str, 
+    example_assistant: str,
+    inference_user: str,
+    model_name: str, 
+    temperature: float,
+    seed: int = 42
+) -> str:
+    messages = [
+        {"role": "system", "content": system_prompt}, 
+        {"role": "user", "content": f"{user_prompt}\n\n# Inputs\n{example_user}"}, 
+        {"role": "assistant", "content": example_assistant}, 
+        {"role": "user", "content": f"{user_prompt}\n\n# Inputs\n{inference_user}"},
+    ]
+    completion = client.chat.completions.create(
+        model=model_name, 
+        temperature=temperature,
+        messages=messages, 
+        seed=seed
+    )
+    return completion.choices[0].message.content
+
+
+
+def mainCoT(args):
+
+    client = OpenAI(api_key=args.client_key)
+    
+    with open(args.data, 'r') as dat:
+        data = BeautifulSoup(dat, 'xml')
+    with open(args.keys, 'r') as k:
+        keys = json.load(k)
+    with open(Path(args.prompts_folder) / "system-CoT.txt", 'r') as sys:
+        system_prompt = sys.read()
+    with open(Path(args.prompts_folder) / "user-CoT.txt", 'r') as sys:
+        user_prompt = sys.read()
+    
+    answers_dir = Path(args.res_path) / "answers-CoT"
+    os.makedirs(answers_dir, exist_ok=True)
+
+    cases = [case for case in data.find_all('case')]
+    for seed in range(args.n_seeds):
+        print(f"Working on seed {seed}")
+        print(f"Using model {args.model}")
+        print(f"Using temperature {args.temperature}\n")
+        case_id = 1
+        answers = []
+        for i in range(len(cases)):
+            if case_id == 1: 
+                ex = 2
+            elif case_id == 2:
+                ex = 1
+            else:
+                np.random.seed(seed)
+                ex = int(np.random.randint(low=1, high=3))
+            with open(Path(args.prompts_folder) / f"output-CoT-example-{ex}.txt", 'r') as sys:
+                example_output = sys.read()
+            inference_case = cases[i]
+            print(f"Few-shotting case {inference_case['id']}")
+            print(f"Using example n{ex}")
+            answer = responseCoTGPT(
+                client=client,
+                system_prompt=system_prompt, 
+                user_prompt=user_prompt,
+                example_user=formatInferencePrompt(cases[ex]), 
+                example_assistant=example_output,
+                inference_user=formatInferencePrompt(inference_case),
+                model_name=args.model, 
+                temperature=args.temperature,
+                seed=seed
+            )
+            print(answer)
+            answers.append({'case_id': str(case_id), 'answer': format_output_answer(answer)})
+            case_id += 1
+        print(f"\nEnd of few-shot on seed {seed}, saving results.\n")
+        with open(Path(answers_dir) / f"answers_{args.model}_seed{seed}.json", 'w') as res:
+            json.dump(answers, res)
+
+
+
 def main():
     args = parse()
     if args.mode == "few-shot":
@@ -312,6 +397,10 @@ def main():
     elif args.mode == "zero-shot":
         print("ZERO-SHOT SCRIPT RUNNING\n")
         mainZeroShot(args=args)
+    elif args.mode == "chain-of-thought":
+        print("CoT SCRIPT RUNNING\n")
+        mainCoT(args=args)
+
 
 
 if __name__ == "__main__":

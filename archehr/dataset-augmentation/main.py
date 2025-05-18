@@ -169,4 +169,4 @@ qa_results_df = qa_results_df[["case_id", "note_excerpt", "question_generated", 
 # save_dir = "qa_generation/"
 # os.makedirs(save_dir, exist_ok=True)
 
-# final_df.to_excel(os.path.join(save_dir, "qa_results_structured.xlsx"), index=False)
+# qa_results_df.to_excel(os.path.join(save_dir, "qa_results_structured.xlsx"), index=False)

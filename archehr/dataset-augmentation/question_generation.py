@@ -8,9 +8,6 @@ from utils import convert_xml_df
 from tqdm import tqdm
 # import os
 
-# === Setup ===
-
-# client = OpenAI(api_key="your-api-key-here")
 
 # === Functions ===
 

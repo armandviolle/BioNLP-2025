@@ -86,15 +86,17 @@ def process_cases(seeds: List[int], output_folder: str):
 
     # Load system prompts
     system_prompt_path = BASE_DIR / "config" / "prompt_chaining"
-    with open(system_prompt_path / "free_answer.txt", "r") as f:
+    with open(system_prompt_path / "1-free_answer.txt", "r") as f:
         system_prompt_free_answer = f.read()
-    with open(system_prompt_path / "essential_sentences_identification.txt", "r") as f:
+    with open(
+        system_prompt_path / "2-essential_sentences_identification.txt", "r"
+    ) as f:
         system_prompt_essential_sentences = f.read()
-    with open(system_prompt_path / "answer_reformulation.txt", "r") as f:
+    with open(system_prompt_path / "3-answer_reformulation.txt", "r") as f:
         system_prompt_answer_reformulation = f.read()
-    with open(system_prompt_path / "answer_compression.txt", "r") as f:
+    with open(system_prompt_path / "4-answer_compression.txt", "r") as f:
         system_prompt_answer_compression = f.read()
-    with open(system_prompt_path / "strict_answer_compression.txt", "r") as f:
+    with open(system_prompt_path / "5-strict_answer_compression.txt", "r") as f:
         system_prompt_strict_answer_compression = f.read()
 
     results = []

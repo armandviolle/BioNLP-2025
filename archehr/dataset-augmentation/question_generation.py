@@ -54,8 +54,6 @@ Here are several examples of how to analyze the following examples and generate 
         
         f"Note Excerpt:\n\n{new_input}\n\n"
         
-        # f"Generate the following:\n\n"
-        
         f"Question: <your generated question>"
         
     )

@@ -188,7 +188,7 @@ def generate_questions_summary(open_ai_key,i2b2_dataset_path,emrqa_dataset_hf_pa
     # Number of samples per bin
     samples_per_bin = 120
 
-    # Sample 75 from each bin
+    
     sampled_rows = (
         filtered_df.groupby('length_bin', group_keys=False)
         .apply(lambda x: x.sample(n=samples_per_bin, random_state=42))

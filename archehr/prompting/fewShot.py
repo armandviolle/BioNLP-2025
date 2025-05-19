@@ -9,10 +9,11 @@ from openai import OpenAI
 
 
 def str2bool(v):
-    if v.lower() in ('true', '1'):
+    if v.lower() in ("true", "1"):
         return True
-    elif v.lower() in ('false', '0'):
+    elif v.lower() in ("false", "0"):
         return False
+
 
 def parse():
     parser = argparse.ArgumentParser()
@@ -30,30 +31,31 @@ def parse():
     return parser.parse_args()
 
 
-
 def format_input(
-    cases: list, 
-    relevance_keys: list, 
+    cases: list,
+    relevance_keys: list,
 ) -> list:
     res_cases = []
     for case in cases:
-        case_id = case['id']
+        case_id = case["id"]
         case_dict = {
-            'case_id': case_id, 
-            'full_case': case,
-            'patient_question': case.find('patient_question').get_text(strip=True), 
-            'clinician_question': case.find('clinician_question').get_text(strip=True), 
-            'sentences': {'essential': [], 'supplementary': [], 'not-relevant': []}
+            "case_id": case_id,
+            "full_case": case,
+            "patient_question": case.find("patient_question").get_text(strip=True),
+            "clinician_question": case.find("clinician_question").get_text(strip=True),
+            "sentences": {"essential": [], "supplementary": [], "not-relevant": []},
         }
-        sentences = case.find('note_excerpt_sentences')
-        for sentence in sentences.find_all('sentence'):
-            senID = sentence['id']
+        sentences = case.find("note_excerpt_sentences")
+        for sentence in sentences.find_all("sentence"):
+            senID = sentence["id"]
             # if relevance_keys[int(case_id)-1]['answers'][int(senID)]['relevance'] in ['essential', 'supplementary']:
-            senRelevance = relevance_keys[int(case_id)-1]['answers'][int(senID)-1]['relevance']
-            case_dict['sentences'][senRelevance].append({
-                'sentence_id': senID, 
-                'sentence_text': sentence.get_text(strip=True), 
-                'sentence_xml': f"<sentence id={senID}>\n{sentence.get_text(strip=True)}\n</sentence>"
+            senRelevance = relevance_keys[int(case_id) - 1]["answers"][int(senID) - 1][
+                "relevance"
+            ]
+            case_dict["sentences"][senRelevance].append({
+                "sentence_id": senID,
+                "sentence_text": sentence.get_text(strip=True),
+                "sentence_xml": f"<sentence id={senID}>\n{sentence.get_text(strip=True)}\n</sentence>",
             })
         res_cases.append(case_dict)
     return res_cases
@@ -65,174 +67,182 @@ def find_essentials(
 ) -> list:
     out = []
     for i in range(len(keys)):
-        if keys[i]['case_id'] == case_id:
-            answers = keys[i]['answers']
+        if keys[i]["case_id"] == case_id:
+            answers = keys[i]["answers"]
             for answer in answers:
-                if answer['relevance'] == "essential":
-                    out.append(answer['sentence_id'])
+                if answer["relevance"] == "essential":
+                    out.append(answer["sentence_id"])
             break
     return out
 
 
-def extract_sentences(
-    case_id: str, 
-    list_ids: list, 
-    cases: BeautifulSoup
-) -> list:
-    case = cases.find(lambda tag: tag.name=='case' and tag.has_attr('id') and tag['id']==case_id)
-    out = [case.find('patient_question').get_text(strip=True)]
-    sentences = case.find('note_excerpt_sentences')
-    for sentence in sentences.find_all('sentence'):
-        if sentence['id'] in list_ids:
+def extract_sentences(case_id: str, list_ids: list, cases: BeautifulSoup) -> list:
+    case = cases.find(
+        lambda tag: tag.name == "case" and tag.has_attr("id") and tag["id"] == case_id
+    )
+    out = [case.find("patient_question").get_text(strip=True)]
+    sentences = case.find("note_excerpt_sentences")
+    for sentence in sentences.find_all("sentence"):
+        if sentence["id"] in list_ids:
             out.append(sentence.get_text(strip=True))
     return "\n".join(out)
 
 
-
 import re
+
+
 def format_output(output):
     new_output = []
-    pattern = r'.*?\|\d+(?:,\d+)*\|'
+    pattern = r".*?\|\d+(?:,\d+)*\|"
     for res_case in output:
-        parts = re.findall(pattern, output['answer'])
+        parts = re.findall(pattern, output["answer"])
         parts = [part.strip() for part in parts]
-        new_output.append({'case_id': str(res_case['case_id']), 'answer': "\n".join(parts)})
+        new_output.append({
+            "case_id": str(res_case["case_id"]),
+            "answer": "\n".join(parts),
+        })
     return new_output
 
+
 def format_output_answer(original_answer):
-    pattern = r'.*?\|\d+(?:,\d+)*\|'
+    pattern = r".*?\|\d+(?:,\d+)*\|"
     parts = re.findall(pattern, original_answer)
     parts = [part.strip() for part in parts]
     return "\n".join(parts)
 
 
-
 def zeroShotGPT(
     client,
-    system_prompt: str, 
-    user_prompt: str, 
+    system_prompt: str,
+    user_prompt: str,
     model_name: str,
     temperature: float,
-    seed: int = 42
+    seed: int = 42,
 ) -> str:
-    messages=[
-        {"role": "system", "content": system_prompt}, 
-        {"role": "user", "content": user_prompt}, 
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
     ]
     completion = client.chat.completions.create(
-        model=model_name, 
-        temperature=temperature,
-        messages=messages,
-        seed=seed
+        model=model_name, temperature=temperature, messages=messages, seed=seed
     )
     return completion.choices[0].message.content
 
 
-
 def formatInferencePrompt(
     case: bs4.element.Tag,
-) -> str: 
+) -> str:
     return f"{case.find('patient_narrative')}\n{case.find('patient_question')}\n{case.find('clinician_question')}\n{case.find('note_excerpt_sentences')}\n"
 
 
 def fewShotGPT(
     client,
-    system_prompt: str, 
+    system_prompt: str,
     user_assistant_prompts: list,
-    user_inference_prompt: str, 
+    user_inference_prompt: str,
     model_name: str,
     temperature: float,
-    seed: int = 42
+    seed: int = 42,
 ) -> str:
     messages = [{"role": "system", "content": system_prompt}]
     for i in range(len(user_assistant_prompts)):
-        messages.append({"role": "user", "content": user_assistant_prompts[i]['user']})
-        messages.append({"role": "assistant", "content": user_assistant_prompts[i]['assistant']})
+        messages.append({"role": "user", "content": user_assistant_prompts[i]["user"]})
+        messages.append({
+            "role": "assistant",
+            "content": user_assistant_prompts[i]["assistant"],
+        })
     messages.append({"role": "user", "content": user_inference_prompt})
     completion = client.chat.completions.create(
-        model=model_name, 
-        temperature=temperature,
-        messages=messages, 
-        seed=seed
+        model=model_name, temperature=temperature, messages=messages, seed=seed
     )
     return completion.choices[0].message.content
 
 
-
 def formatParaphrasePrompt(case: dict) -> str:
-    essential_sentences = case['sentences']['essential']
-    sentences_prompt = "\n".join([sentence['sentence_xml'] for sentence in essential_sentences])
-    question = case['patient_question']
+    essential_sentences = case["sentences"]["essential"]
+    sentences_prompt = "\n".join([
+        sentence["sentence_xml"] for sentence in essential_sentences
+    ])
+    question = case["patient_question"]
     return f"{sentences_prompt}\n<question>\n{question}\n</question>\n"
+
 
 def generateUserAssistantPrompts(
     client,
     labelled_cases: list,
-    system_paraphrasing_prompt: str, 
-    model_name: str, 
+    system_paraphrasing_prompt: str,
+    model_name: str,
     temperature: float,
-    seed: int = 42
+    seed: int = 42,
 ) -> list:
     responses = []
-    for case in labelled_cases: 
+    for case in labelled_cases:
         user_paraphrasing_input = formatParaphrasePrompt(case=case)
         # if case['case_id'] == "1":
         #     print(f"\nSYSTEM PARAPHRASING PROMPT\n{system_paraphrasing_prompt}\n")
         #     print(f"\nUSER PARAPHRASING PROMPT\n{user_paraphrasing_prompt}\n")
         #     print(f"\nUSER PARAPHRASING INPUT (case 1)\n{user_paraphrasing_input}\n")
         responses.append({
-            'case_id': case['case_id'], 
-            'user': formatInferencePrompt(case=case['full_case']), 
-            'assistant': format_output_answer(zeroShotGPT(
-                client,
-                system_prompt=system_paraphrasing_prompt, 
-                user_prompt=user_paraphrasing_input, 
-                model_name=model_name, 
-                temperature=temperature,
-                seed=seed
-            ))
+            "case_id": case["case_id"],
+            "user": formatInferencePrompt(case=case["full_case"]),
+            "assistant": format_output_answer(
+                zeroShotGPT(
+                    client,
+                    system_prompt=system_paraphrasing_prompt,
+                    user_prompt=user_paraphrasing_input,
+                    model_name=model_name,
+                    temperature=temperature,
+                    seed=seed,
+                )
+            ),
         })
     return responses
 
 
-
 def mainFewShot(args):
-
     client = OpenAI(api_key=args.client_key)
-    
-    with open(args.data, 'r') as dat:
-        data = BeautifulSoup(dat, 'xml')
-    with open(args.keys, 'r') as k:
+
+    with open(args.data, "r") as dat:
+        data = BeautifulSoup(dat, "xml")
+    with open(args.keys, "r") as k:
         keys = json.load(k)
-    with open(Path(args.prompts_folder) / "zero-shot.txt", 'r') as sys:
+    with open(Path(args.prompts_folder) / "zero-shot.txt", "r") as sys:
         system_prompt = sys.read()
-    with open(Path(args.prompts_folder) / "zero-shot-paraphrasing.txt", 'r') as sys_par:
+    with open(Path(args.prompts_folder) / "zero-shot-paraphrasing.txt", "r") as sys_par:
         system_paraphrasing_prompt = sys_par.read()
-    
+
     paraphrases_dir = Path(args.res_path) / "paraphrases"
     os.makedirs(paraphrases_dir, exist_ok=True)
     answers_dir = Path(args.res_path) / "answers"
     os.makedirs(answers_dir, exist_ok=True)
 
-    cases = [case for case in data.find_all('case')]
+    cases = [case for case in data.find_all("case")]
     if os.path.exists(Path(paraphrases_dir) / f"paraphrases_{args.model}.json"):
-        print(f"\nUsing existing paraphrases at {Path(paraphrases_dir) / f"paraphrases_{args.model}.json"}\n")
-        with open(Path(paraphrases_dir) / f"paraphrases_{args.model}.json", 'r') as res_para:
+        print(
+            f"\nUsing existing paraphrases at {Path(paraphrases_dir) / f'paraphrases_{args.model}.json'}\n"
+        )
+        with open(
+            Path(paraphrases_dir) / f"paraphrases_{args.model}.json", "r"
+        ) as res_para:
             paraphrases = json.load(res_para)
     else:
         print("\nGenerating paraphrases")
         labelled_cases = format_input(cases=cases, relevance_keys=keys)
         paraphrases = generateUserAssistantPrompts(
             client=client,
-            labelled_cases=labelled_cases, 
-            system_paraphrasing_prompt=system_paraphrasing_prompt, 
-            model_name=args.model, 
-            temperature=args.temperature
+            labelled_cases=labelled_cases,
+            system_paraphrasing_prompt=system_paraphrasing_prompt,
+            model_name=args.model,
+            temperature=args.temperature,
         )
-        with open(Path(paraphrases_dir) / f"paraphrases_{args.model}.json", 'w') as res_para:
+        with open(
+            Path(paraphrases_dir) / f"paraphrases_{args.model}.json", "w"
+        ) as res_para:
             json.dump(paraphrases, res_para)
-        print(f"Using generated paraphrases saved at {Path(paraphrases_dir) / f"paraphrases_{args.model}.json"}\n")
-    
+        print(
+            f"Using generated paraphrases saved at {Path(paraphrases_dir) / f'paraphrases_{args.model}.json'}\n"
+        )
+
     for seed in range(args.n_seeds):
         print(f"Working on seed {seed}")
         print(f"Using model {args.model}")
@@ -241,46 +251,51 @@ def mainFewShot(args):
         answers = []
         for i in range(len(cases)):
             np.random.seed(seed)
-            all_examples = [ex for ex in paraphrases if ex['case_id']!=str(case_id)]
-            selected_ids = np.random.choice([ex['case_id'] for ex in all_examples], size=5, replace=False)
+            all_examples = [ex for ex in paraphrases if ex["case_id"] != str(case_id)]
+            selected_ids = np.random.choice(
+                [ex["case_id"] for ex in all_examples], size=5, replace=False
+            )
             print(f"Selected example-cases for case {case_id}: {selected_ids}")
-            used_examples = [ex for ex in all_examples if ex['case_id'] in selected_ids]
+            used_examples = [ex for ex in all_examples if ex["case_id"] in selected_ids]
             inference_case = cases[i]
             print(f"Few-shotting case {inference_case['id']}")
             answer = fewShotGPT(
                 client=client,
-                system_prompt=system_prompt, 
+                system_prompt=system_prompt,
                 user_assistant_prompts=used_examples,
-                user_inference_prompt=formatInferencePrompt(case=inference_case), 
+                user_inference_prompt=formatInferencePrompt(case=inference_case),
                 model_name=args.model,
-                temperature=args.temperature, 
-                seed=seed
+                temperature=args.temperature,
+                seed=seed,
             )
-            answers.append({'case_id': str(case_id), 'answer': format_output_answer(answer)})
+            answers.append({
+                "case_id": str(case_id),
+                "answer": format_output_answer(answer),
+            })
             case_id += 1
         print(f"\nEnd of few-shot on seed {seed}, saving results.\n")
-        with open(Path(answers_dir) / f"answers_{args.model}_seed{seed}.json", 'w') as res:
+        with open(
+            Path(answers_dir) / f"answers_{args.model}_seed{seed}.json", "w"
+        ) as res:
             json.dump(answers, res)
 
 
-
 def mainZeroShot(args):
-
     client = OpenAI(api_key=args.client_key)
-    
-    with open(args.data, 'r') as dat:
-        data = BeautifulSoup(dat, 'xml')
-    with open(args.keys, 'r') as k:
+
+    with open(args.data, "r") as dat:
+        data = BeautifulSoup(dat, "xml")
+    with open(args.keys, "r") as k:
         keys = json.load(k)
-    with open(Path(args.prompts_folder) / "zero-shot.txt", 'r') as sys:
+    with open(Path(args.prompts_folder) / "zero-shot.txt", "r") as sys:
         system_prompt = sys.read()
-    with open(Path(args.prompts_folder) / "zero-shot-paraphrasing.txt", 'r') as sys_par:
+    with open(Path(args.prompts_folder) / "zero-shot-paraphrasing.txt", "r") as sys_par:
         system_paraphrasing_prompt = sys_par.read()
-    
+
     answers_dir = Path(args.res_path) / "answers-zero"
     os.makedirs(answers_dir, exist_ok=True)
 
-    cases = [case for case in data.find_all('case')]
+    cases = [case for case in data.find_all("case")]
     for seed in range(args.n_seeds):
         print(f"Working on seed {seed}")
         print(f"Using model {args.model}")
@@ -292,64 +307,63 @@ def mainZeroShot(args):
             print(f"Zero-shotting case {inference_case['id']}")
             answer = zeroShotGPT(
                 client=client,
-                system_prompt=system_prompt, 
+                system_prompt=system_prompt,
                 user_prompt=formatInferencePrompt(case=inference_case),
-                model_name=args.model, 
+                model_name=args.model,
                 temperature=args.temperature,
                 seed=seed,
             )
-            answers.append({'case_id': str(case_id), 'answer': format_output_answer(answer)})
+            answers.append({
+                "case_id": str(case_id),
+                "answer": format_output_answer(answer),
+            })
             case_id += 1
         print(f"\nEnd of few-shot on seed {seed}, saving results.\n")
-        with open(Path(answers_dir) / f"answers_{args.model}_seed{seed}.json", 'w') as res:
+        with open(
+            Path(answers_dir) / f"answers_{args.model}_seed{seed}.json", "w"
+        ) as res:
             json.dump(answers, res)
-
 
 
 def responseCoTGPT(
     client: OpenAI,
-    system_prompt: str, 
+    system_prompt: str,
     user_prompt: str,
-    example_user: str, 
+    example_user: str,
     example_assistant: str,
     inference_user: str,
-    model_name: str, 
+    model_name: str,
     temperature: float,
-    seed: int = 42
+    seed: int = 42,
 ) -> str:
     messages = [
-        {"role": "system", "content": system_prompt}, 
-        {"role": "user", "content": f"{user_prompt}\n\n# Inputs\n{example_user}"}, 
-        {"role": "assistant", "content": example_assistant}, 
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"{user_prompt}\n\n# Inputs\n{example_user}"},
+        {"role": "assistant", "content": example_assistant},
         {"role": "user", "content": f"{user_prompt}\n\n# Inputs\n{inference_user}"},
     ]
     completion = client.chat.completions.create(
-        model=model_name, 
-        temperature=temperature,
-        messages=messages, 
-        seed=seed
+        model=model_name, temperature=temperature, messages=messages, seed=seed
     )
     return completion.choices[0].message.content
 
 
-
 def mainCoT(args):
-
     client = OpenAI(api_key=args.client_key)
-    
-    with open(args.data, 'r') as dat:
-        data = BeautifulSoup(dat, 'xml')
-    with open(args.keys, 'r') as k:
+
+    with open(args.data, "r") as dat:
+        data = BeautifulSoup(dat, "xml")
+    with open(args.keys, "r") as k:
         keys = json.load(k)
-    with open(Path(args.prompts_folder) / "system-CoT.txt", 'r') as sys:
+    with open(Path(args.prompts_folder) / "system-CoT.txt", "r") as sys:
         system_prompt = sys.read()
-    with open(Path(args.prompts_folder) / "user-CoT.txt", 'r') as sys:
+    with open(Path(args.prompts_folder) / "user-CoT.txt", "r") as sys:
         user_prompt = sys.read()
-    
+
     answers_dir = Path(args.res_path) / "answers-CoT"
     os.makedirs(answers_dir, exist_ok=True)
 
-    cases = [case for case in data.find_all('case')]
+    cases = [case for case in data.find_all("case")]
     for seed in range(args.n_seeds):
         print(f"Working on seed {seed}")
         print(f"Using model {args.model}")
@@ -357,36 +371,42 @@ def mainCoT(args):
         case_id = 1
         answers = []
         for i in range(len(cases)):
-            if case_id == 1: 
+            if case_id == 1:
                 ex = 2
             elif case_id == 2:
                 ex = 1
             else:
                 np.random.seed(seed)
                 ex = int(np.random.randint(low=1, high=3))
-            with open(Path(args.prompts_folder) / f"output-CoT-example-{ex}.txt", 'r') as sys:
+            with open(
+                Path(args.prompts_folder) / f"output-CoT-example-{ex}.txt", "r"
+            ) as sys:
                 example_output = sys.read()
             inference_case = cases[i]
             print(f"Few-shotting case {inference_case['id']}")
             print(f"Using example n{ex}")
             answer = responseCoTGPT(
                 client=client,
-                system_prompt=system_prompt, 
+                system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                example_user=formatInferencePrompt(cases[ex]), 
+                example_user=formatInferencePrompt(cases[ex]),
                 example_assistant=example_output,
                 inference_user=formatInferencePrompt(inference_case),
-                model_name=args.model, 
+                model_name=args.model,
                 temperature=args.temperature,
-                seed=seed
+                seed=seed,
             )
             print(answer)
-            answers.append({'case_id': str(case_id), 'answer': format_output_answer(answer)})
+            answers.append({
+                "case_id": str(case_id),
+                "answer": format_output_answer(answer),
+            })
             case_id += 1
         print(f"\nEnd of few-shot on seed {seed}, saving results.\n")
-        with open(Path(answers_dir) / f"answers_{args.model}_seed{seed}.json", 'w') as res:
+        with open(
+            Path(answers_dir) / f"answers_{args.model}_seed{seed}.json", "w"
+        ) as res:
             json.dump(answers, res)
-
 
 
 def main():
@@ -400,7 +420,6 @@ def main():
     elif args.mode == "chain-of-thought":
         print("CoT SCRIPT RUNNING\n")
         mainCoT(args=args)
-
 
 
 if __name__ == "__main__":

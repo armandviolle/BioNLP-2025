@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 from datasets import Dataset
 from sentence_transformers import CrossEncoder
 import torch
-import torch.nn as nn
 from sentence_transformers.cross_encoder.losses import BinaryCrossEntropyLoss
 from sklearn.metrics import precision_recall_fscore_support
 from tqdm import tqdm

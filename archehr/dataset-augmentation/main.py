@@ -20,25 +20,29 @@ api_key = "YOUR_API_KEY"
 # Download the 2012 i2b2 challenge dataset '2012-07-15.original-annotation.release/'
 # I2B2-2012 data requires signing the n2nb2 license.
 
-df = generate_questions_summary(open_ai_key = api_key ,i2b2_dataset_path = "i2b2_data_dir", emrqa_dataset_hf_path = "Eladio/emrqa-msquad" ,mimic_3_dataset_hf_path = "Medilora/mimic_iii_diagnosis_anonymous")
+df = generate_questions_summary(
+    open_ai_key=api_key,
+    i2b2_dataset_path="i2b2_data_dir",
+    emrqa_dataset_hf_path="Eladio/emrqa-msquad",
+    mimic_3_dataset_hf_path="Medilora/mimic_iii_diagnosis_anonymous",
+)
 
 qa_results = []
 case_counter = 1  # Start case ID from 1
 
 for i in tqdm(range(len(df))):
-    context = df['note_excerpt'].iloc[i]
-    query = df['generated_question'].iloc[i]
-    data_source = df['source'].iloc[i]
+    context = df["note_excerpt"].iloc[i]
+    query = df["generated_question"].iloc[i]
+    data_source = df["source"].iloc[i]
 
     # --- Split into all sentences ---
-    sentences = re.split(r'(?<=[.!?])\s+', context.strip())
+    sentences = re.split(r"(?<=[.!?])\s+", context.strip())
     all_sentences = [s.strip() for s in sentences if s.strip()]
 
     # --- Embed all sentences and build retriever ---
     documents = [Document(page_content=sentence) for sentence in all_sentences]
     embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     vectorstore = FAISS.from_documents(documents, embeddings)
-
 
     # --- Get all sentences with similarity scores ---
     all_results = vectorstore.similarity_search_with_score(query, k=len(documents))
@@ -49,13 +53,14 @@ for i in tqdm(range(len(df))):
     essential_sentences = [doc[0].page_content.strip() for doc in essential_docs]
 
     # Supplementary: take next 4 (ranks 8–10)
-    supplementary_docs = all_results[top_k:top_k+4]
-    supplementary_sentences = [doc[0].page_content.strip() for doc in supplementary_docs]
+    supplementary_docs = all_results[top_k : top_k + 4]
+    supplementary_sentences = [
+        doc[0].page_content.strip() for doc in supplementary_docs
+    ]
 
     # Not relevant : remaining ones
     used = set(essential_sentences + supplementary_sentences)
     not_relevant_sentences = [s for s in all_sentences if s not in used]
-
 
     for sentence_id, sentence in enumerate(all_sentences, start=1):
         if sentence in essential_sentences:
@@ -72,10 +77,8 @@ for i in tqdm(range(len(df))):
             "sentence_id": sentence_id,
             "ref_excerpt": sentence,
             "relevance": label,
-            "source": data_source
+            "source": data_source,
         })
-
-
 
     case_counter += 1  # Increment case ID
 
@@ -85,7 +88,17 @@ for i in tqdm(range(len(df))):
 qa_results_df = pd.DataFrame(qa_results)
 
 # Reorder columns
-qa_results_df = qa_results_df[["case_id", "note_excerpt", "question_generated", "sentence_id", "ref_excerpt", "relevance", "source"]]
+qa_results_df = qa_results_df[
+    [
+        "case_id",
+        "note_excerpt",
+        "question_generated",
+        "sentence_id",
+        "ref_excerpt",
+        "relevance",
+        "source",
+    ]
+]
 
 
 # # Save to Excel

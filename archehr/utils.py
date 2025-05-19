@@ -195,9 +195,7 @@ def responseGPT(
     return completion.choices[0].message.content
 
 
-
-
-def convert_xml_df(xml_path,key_json_path):
+def convert_xml_df(xml_path, key_json_path):
     # Load and parse the XML file
 
     tree = ET.parse(xml_path)
@@ -224,7 +222,7 @@ def convert_xml_df(xml_path,key_json_path):
             note_sentences.append({
                 "case_id": case_id,
                 "sentence_id": sent_id,
-                "ref_excerpt": text
+                "ref_excerpt": text,
             })
 
         # Extract full note excerpt
@@ -236,25 +234,28 @@ def convert_xml_df(xml_path,key_json_path):
             "patient_question_phrases": phrases,
             "clinician_question": clinician_question,
             "note_excerpt": note_excerpt,
-            "note_sentences": note_sentences
+            "note_sentences": note_sentences,
         })
 
     # Flatten note_sentences into a DataFrame
-    note_sentences_df = pd.DataFrame(
-        [s for case in cases_data for s in case["note_sentences"]]
-    )
+    note_sentences_df = pd.DataFrame([
+        s for case in cases_data for s in case["note_sentences"]
+    ])
 
     # Build the main case-level DataFrame
-    cases_df = pd.DataFrame([{
-        "case_id": c["case_id"],
-        "patient_narrative": c["patient_narrative"],
-        "patient_question_phrases": c["patient_question_phrases"],
-        "clinician_question": c["clinician_question"],
-        "note_excerpt": c["note_excerpt"]
-    } for c in cases_data])
+    cases_df = pd.DataFrame([
+        {
+            "case_id": c["case_id"],
+            "patient_narrative": c["patient_narrative"],
+            "patient_question_phrases": c["patient_question_phrases"],
+            "clinician_question": c["clinician_question"],
+            "note_excerpt": c["note_excerpt"],
+        }
+        for c in cases_data
+    ])
 
     # Load the key.json file
-    
+
     with open(key_json_path, "r") as f:
         key_data = json.load(f)
 
@@ -266,29 +267,32 @@ def convert_xml_df(xml_path,key_json_path):
             relevance_labels.append({
                 "case_id": case_id,
                 "sentence_id": ans["sentence_id"],
-                "relevance": ans["relevance"]
+                "relevance": ans["relevance"],
             })
 
     relevance_df = pd.DataFrame(relevance_labels)
 
     # Merge sentence-level data with relevance labels
-    note_with_labels_df = pd.merge(note_sentences_df, relevance_df, on=["case_id", "sentence_id"], how="left")
+    note_with_labels_df = pd.merge(
+        note_sentences_df, relevance_df, on=["case_id", "sentence_id"], how="left"
+    )
 
     # Add full note_excerpt to each row
     note_with_labels_df = pd.merge(
         note_with_labels_df,
         cases_df[["case_id", "note_excerpt"]],
         on="case_id",
-        how="left"
+        how="left",
     )
-
 
     # Merge all_cases and notes_with_excerpt
     merged_df = pd.merge(
-        note_with_labels_df.drop(columns=["note_excerpt"]),  # drop to avoid duplicate column
+        note_with_labels_df.drop(
+            columns=["note_excerpt"]
+        ),  # drop to avoid duplicate column
         cases_df,  # includes note_excerpt
         on="case_id",
-        how="left"
+        how="left",
     )
 
     # Reorder columns so note_excerpt comes right after case_id

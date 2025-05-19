@@ -2,7 +2,7 @@
 name = "archehr"
 version = "0.1.0"
 description = "LIMICS@BioNLP 2025 shared task"
-authors = ["Adam Remaki", "Armand Violle", "Natrajvikram Sivabalasubramanian", "Etienne Guével", "Akram Redjdal"]
+authors = ["Adam Remaki", "Armand Violle", "Vikram Natraj", "Etienne Guével", "Akram Redjdal"]
 license = "MIT"
 
 [tool.poetry.dependencies]

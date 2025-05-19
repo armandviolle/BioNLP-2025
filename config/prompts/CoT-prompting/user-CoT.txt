@@ -1,0 +1,5 @@
+# Reasoning Steps
+1. Identify relevant information from the note_excerpt_sentences based on the patient’s question.
+2. At the end of each response sentence, cite the supporting note_excerpt_sentences ID(s) like this: |1| or |2,3| if multiple.
+3. Paraphrase and summarize the relevant information.
+4. Ensure the answer is between 70 and 75 words, excluding citations.

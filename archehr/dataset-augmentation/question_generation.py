@@ -2,7 +2,6 @@ import pandas as pd
 import re
 from openai import OpenAI
 from typing import List
-import re
 from datasets import load_dataset
 from i2b2_data_extraction import parse_xml_file
 from utils import convert_xml_df

@@ -36,7 +36,7 @@ for i in tqdm(range(len(df))):
 
     # --- Embed all sentences and build retriever ---
     documents = [Document(page_content=sentence) for sentence in all_sentences]
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     vectorstore = FAISS.from_documents(documents, embeddings)
 
 
@@ -48,7 +48,7 @@ for i in tqdm(range(len(df))):
     essential_docs = all_results[:top_k]
     essential_sentences = [doc[0].page_content.strip() for doc in essential_docs]
 
-    # Supplementary: take next 3 (ranks 8–10)
+    # Supplementary: take next 4 (ranks 8–10)
     supplementary_docs = all_results[top_k:top_k+4]
     supplementary_sentences = [doc[0].page_content.strip() for doc in supplementary_docs]
 

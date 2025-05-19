@@ -38,7 +38,6 @@ for i in tqdm(range(len(df))):
     documents = [Document(page_content=sentence) for sentence in all_sentences]
     embeddings = OpenAIEmbeddings()
     vectorstore = FAISS.from_documents(documents, embeddings)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 7})
 
 
     # --- Get all sentences with similarity scores ---
